@@ -1,100 +1,76 @@
 'use strict';
-
 import puppeteer from 'puppeteer';
 
-const formLink = 'https://docs.google.com/forms/d/e/1FAIpQLSf_HwDrQBivEirlRIgrteLsqpFpE_B-ldb8JTEdMOhxx48xmA/viewform';
+const FORM_URL =
+    'https://docs.google.com/forms/d/e/1FAIpQLScXETMEwR1VjvGTBUo3-WaOcS1-M2duYhLaQ1Kem_2vo5TG8w/viewform';
 
-// Multiple form submission using a loop
-// for (let i = 0;i<5;i++){
-//     fill(formLink,true);
-// }
+const SUBMISSIONS = 2;
+const HEADLESS = false;        // false para depurar con la ventana abierta
+const SLOWMO_MS = 120;           // ponga 100-200 ms si quiere ver cada acción
+const OPTIONS = {
+    edad: ['20-30', '30-40', '40-55'],
+    genero: ['Femenino', 'Masculino'],
+    trabajo: ['En oficina', 'Remoto', 'Negocio propio'],
+    almuerzo: ['Llevo almuerzo', 'Compro', 'A veces compro'],
+    saludable: ['1', '2', '3', '4', '5'],
+    personalizar: ['Poco importante', 'Algo importante', 'Muy importante'],
+    formato: ['Pedir día a día',
+        'Plan semanal (de lunes a viernes)',
+        'Suscripción mensual'],
+    tiempo: ['Media hora', 'Una hora', 'Hora y media'],
+    precio: ['250-400', '400-650']
+};
 
-fill(formLink,true);
 
-async function fill(formLink, submitForm) {
+const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+const delay = ms => new Promise(r => setTimeout(r, ms));
 
-    let dropdownAnswer = 'Choice 1';
+(async () => {
+    const browser = await puppeteer.launch({
+        headless: HEADLESS,
+        args: ['--no-sandbox'],
+        slowMo: SLOWMO_MS
+    });
 
-    let browser;
-
+    for (let i = 1; i <= SUBMISSIONS; i++) {
+        const page = await browser.newPage();
         try {
-            browser = await puppeteer.launch({
-                headless: true,
-                //headless option runs the browser in the command line
-                //use false option to launch browser with graphic interface
-                args: ['--no-sandbox'],
-                // slowMo: 100
-            });
+            await page.goto(FORM_URL, { waitUntil: 'networkidle2' });
 
+            const answers = {                       // respuestas aleatorias
+                edad: rand(OPTIONS.edad),
+                genero: rand(OPTIONS.genero),
+                trabajo: rand(OPTIONS.trabajo),
+                almuerzo: rand(OPTIONS.almuerzo),
+                saludable: rand(OPTIONS.saludable),
+                personalizar: rand(OPTIONS.personalizar),
+                formato: rand(OPTIONS.formato),
+                tiempo: rand(OPTIONS.tiempo),
+                precio: rand(OPTIONS.precio)
+            };
 
-            const page = await browser.newPage();
-            console.log("Opening form");
-
-            // Opening Form
-            await page.goto(formLink, {waitUntil: 'networkidle2'});
-            const title = await page.$eval("title", el => el.textContent);
-            console.log("form opened");
-            console.log("Form Title: " + title);
-
-            // To answer questions, first identify selectors of all similar questions type
-            // then use the selector index to select the question
-            // then perform an action to answer the question,
-            // e.g. click or type an answer
-
-
-            // Short Answer questions
-            const selectors = await page.$$('.quantumWizTextinputPaperinputContentArea');
-            await selectors[0].click();
-            await page.keyboard.type('Answer to first short answer question');
-            console.log("inserting answer to first short answer question");
-            await selectors[1].click();
-            await page.keyboard.type('Answer to second short answer question');
-            console.log("inserting answer to second short answer question");
-
-            //MCQ and Checkbox Questions
-            const selectors2 = await page.$$('.docssharedWizToggleLabeledLabelWrapper');
-            console.log("identifying selectors of all mcq and checkbox questions ");
-            await selectors2[1].click();
-            console.log("Answered first MCQ question");
-            await selectors2[3].click();
-            console.log("Answered second mcq question");
-            await selectors2[5].click();
-            console.log("ticked 1st checkbox");
-            await selectors2[6].click();
-            console.log("ticked 2nd checkbox");
-            await selectors2[7].click();
-            console.log("ticked 3rd checkbox");
-            await selectors2[8].click();
-            console.log("ticked 4th checkbox");
-            await page.click(".quantumWizMenuPaperselectContent");
-
-            // Dropdown menu questions
-            await page.waitForTimeout(400);
-            await page.click('.exportSelectPopup.quantumWizMenuPaperselectPopup.appsMaterialWizMenuPaperselectPopup>.quantumWizMenuPaperselectOption.appsMaterialWizMenuPaperselectOption.freebirdThemedSelectOptionDarkerDisabled.exportOption[data-value="'+ dropdownAnswer+'"]');
-            console.log("answered dropdown question");
-
-            // Form Submission
-            if(submitForm){
-                await page.waitForTimeout(500);
-                await page.click(".appsMaterialWizButtonPaperbuttonFocusOverlay");
-                await page.waitForNavigation();
-                const submissionPage = await page.url();
-                console.log(submissionPage);
-                if (submissionPage.includes("formResponse")) {
-                    console.log("Form Submitted Successfully");
-                }
+            /* ---------- click en cada radio ---------- */
+            for (const label of Object.values(answers)) {
+                await page.waitForSelector(`div[role="radio"][aria-label="${label}"]`, { visible: true });
+                await page.click(`div[role="radio"][aria-label="${label}"]`);
+                await delay(120 + Math.random() * 200);
             }
 
+
+            /* ---------- enviar ---------- */
+            await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));   // scroll
+            const SUBMIT_XPATH = '//span[normalize-space()="Enviar"]/ancestor::div[@role="button"]';
+            await page.waitForXPath(SUBMIT_XPATH, { visible: true });
+            const [submitBtn] = await page.$x(SUBMIT_XPATH);
+            await submitBtn.click();
+
+            await page.waitForNavigation({ waitUntil: 'networkidle2' });
+            console.log(`✔️  Envío ${i} completado:`, answers);
+        } catch (err) {
+            console.error(`❌  Error en envío ${i}:`, err.message);
+        } finally {
             await page.close();
-            await browser.close();
-
-
-        } catch (error) {
-
-            console.error(error.message);
-
         }
-
-
-
-}
+    }
+    await browser.close();
+})();
