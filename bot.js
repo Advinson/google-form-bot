@@ -12,7 +12,7 @@
  * 4.  The submit button is located via a robust XPath expression that is independent of language and
  *     DOM changes. A short scroll to the bottom guarantees the button is rendered before we click it.
  *
- * Tested with: Node 18+, Puppeteer 21+, Google Forms (May 2025 layout).
+ * Tested with: Node 22.14.0, Puppeteer 21+, Google Forms (May 2025 layout).
  *
  * Author: Advinson Aleman — Last update 2025-05-25
  */
@@ -102,7 +102,7 @@ const delay = ms => new Promise(r => setTimeout(r, ms));
             // 6) Wait for the confirmation page
             await page.waitForNavigation({ waitUntil: 'networkidle2' });
             console.log(`✔️  Envío ${i} completado:`, answers);
-            
+
         } catch (err) {
             console.error(`❌  Error en envío ${i}:`, err.message);
         } finally {
