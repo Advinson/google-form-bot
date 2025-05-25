@@ -1,9 +1,29 @@
+---
+# Google-Form-Bot
+
+Automate any Google Form in seconds.  
+This script uses **Puppeteer** (Chrome + Node 22.14.0) 
+to open a form, pick random answers, and hit **Submit** 
+as many times as you need.
+
+
+
+## Prerequisites
+Node.js 22.14.0
+npm ships with Node 
+Google Chrome / Chromium Bundled automatically by Puppeteer
+
+Install dependencies:
+npm install puppeteer
+---
+
+
 ## Installation
 
 ```bash
-git clone https://github.com/<your-org>/google-form-bot.git
+git clone https://github.com/Advinson/google-form-bot.git
 cd google-form-bot
-npm install
+npm install puppeteer
 ```
 
 No global packages required—everything runs locally.
