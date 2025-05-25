@@ -1,48 +1,3 @@
-````markdown
-# Google-Form-Bot
-
-Automate any Google Form in seconds.  
-This script uses **Puppeteer** (Chrome + Node 22.14.0) to open a form, pick random answers, and hit **Submit** as many times as you need.
-
----
-
-## Table of Contents
-1. [Features](#features)
-2. [Prerequisites](#prerequisites)
-3. [Installation](#installation)
-4. [Configuration](#configuration)
-5. [Running the bot](#running-the-bot)
-6. [Extending to other forms](#extending-to-other-forms)
-7. [Troubleshooting](#troubleshooting)
-8. [Ethical & legal notice](#ethical--legal-notice)
-
----
-
-## Features
-| Capability | Details |
-|------------|---------|
-| **Multiple submissions** | Controlled by `SUBMISSIONS`. |
-| **Random answer pool**   | Answers are drawn from developer-defined arrays. |
-| **Headless / GUI toggle**| One flag (`HEADLESS`) switches between CI mode and visual debugging. |
-| **Human-like timing**    | `SLOWMO_MS` plus jitter helps bypass anti-bot heuristics. |
-| **Language-agnostic submit** | Button found via XPath rather than fragile CSS classes. |
-| **Single-file footprint**| All logic lives inside **`bot.js`**. |
-
----
-
-## Prerequisites
-| Tool | Version |
-|------|---------|
-| **Node.js** | **22.14.0** (or newer) |
-| **npm** | ships with Node |
-| **Google Chrome / Chromium** | Bundled automatically by Puppeteer |
-
-Install dependencies:
-
-```bash
-npm install puppeteer
-````
-
 ---
 
 ## Installation
@@ -135,14 +90,6 @@ Set `HEADLESS = false` to watch every step in a real browser window.
 
 ---
 
-## Ethical & legal notice
-
-Google’s Terms of Service prohibit spam and unauthorized automation. **Run this bot only on forms you own or with explicit permission from the owner.**
-The authors are **not responsible** for misuse or account sanctions.
-
----
-
 Happy automating! 🚀
 
-```
-```
+---
