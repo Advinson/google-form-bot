@@ -1,7 +1,3 @@
-````markdown
-
----
-
 ## Installation
 
 ```bash
