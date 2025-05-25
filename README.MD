@@ -1,5 +1,3 @@
-Below is the complete **README.md** ready for copy-pasting into your repository.
-
 ````markdown
 # Google-Form-Bot
 
